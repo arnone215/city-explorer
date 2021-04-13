@@ -12,7 +12,8 @@ class App extends React.Component {
 
     this.state = {
       city: '',
-      cityData: {}
+      cityData: {},
+      weatherData: [],
     };
   }
   handleFormSubmit = async(event) => {
@@ -24,6 +25,16 @@ class App extends React.Component {
     this.setState({
       cityData: cityICareAboutData
     });
+
+    this.getWeatherData();
+
+  }
+  getWeatherData = async() => {
+    const weatherData = await axios.get('http://localhost:3002/weather')
+    this.setState({
+      weatherData: weatherData.data
+    })
+
   }
   render() {
     return (
@@ -39,7 +50,8 @@ class App extends React.Component {
             Explore!
           </Button>
         </Form>
-        {this.state.cityData.lat !== undefined ? <Jumbotron>
+        {this.state.cityData.lat !== undefined ? 
+        <Jumbotron>
           <h3>{this.state.cityData.display_name}</h3>
           <h5>{this.state.cityData.lat}, {this.state.cityData.lon}</h5>
           <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=13`} alt={`Map of ${this.state.cityData.display_name}`}/>
