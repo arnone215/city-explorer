@@ -4,6 +4,7 @@ import './App.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Jumbotron } from 'react-bootstrap';
+import Weather from './Weather.js';
 import axios from 'axios';
 
 class App extends React.Component {
@@ -30,7 +31,7 @@ class App extends React.Component {
       this.getWeatherData();
     } catch (err) {
       console.log(err);
-      this.setState({error: `${err.message}: ${err.response.data.error}`});
+      this.setState({ error: `${err.message}: ${err.response.data.error}` });
     }
   }
   getWeatherData = async () => {
@@ -56,11 +57,17 @@ class App extends React.Component {
         </Form>
         {this.state.error ? <h3>{this.state.error}</h3> : ''}
         {this.state.cityData.lat !== undefined ?
-          <Jumbotron>
-            <h3>{this.state.cityData.display_name}</h3>
-            <h5>{this.state.cityData.lat}, {this.state.cityData.lon}</h5>
-            <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=13`} alt={`Map of ${this.state.cityData.display_name}`} />
-          </Jumbotron> : ''}
+          (
+            <>
+              <Jumbotron>
+                <h3>{this.state.cityData.display_name}</h3>
+                <h5>{this.state.cityData.lat}, {this.state.cityData.lon}</h5>
+                <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=13`} alt={`Map of ${this.state.cityData.display_name}`} />
+              </Jumbotron>
+              <Weather weatherData={this.state.weatherData} />
+            </>
+          )
+          : ''}
       </>
     )
   }
