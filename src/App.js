@@ -13,8 +13,10 @@ class App extends React.Component {
 
     this.state = {
       city: '',
-      cityData: {},
+      cityData: '',
       weatherData: [],
+      lat: '',
+      lon: '',
     };
   }
   handleFormSubmit = async (event) => {
@@ -24,24 +26,32 @@ class App extends React.Component {
       let cityData = await axios.get(`https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&q=${this.state.city}&format=json`);
       console.log(cityData);
       let cityICareAboutData = cityData.data[0];
+      // this.getWeatherData();
+      const newWeatherData = await this.getWeatherData(cityICareAboutData);
+      console.log(newWeatherData);
       this.setState({
-        cityData: cityICareAboutData
+        cityData: cityICareAboutData.display_name,
+        lat: cityICareAboutData.lat,
+        lon: cityICareAboutData.lon,
+        weatherData: newWeatherData
       });
+      console.log(this.state.cityData, this.state.lat, this.state.lon)
 
-      this.getWeatherData();
     } catch (err) {
       console.log(err);
       this.setState({ error: `${err.message}: ${err.response.data.error}` });
     }
   }
-  getWeatherData = async () => {
-    const weatherData = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/weather`)
-    this.setState({
-      weatherData: weatherData.data
-    })
-
+  getWeatherData = async (cityICareAboutData) => {
+    console.log('here');
+    const weatherData = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/weather`, {params: {lat: cityICareAboutData.lat, lon: cityICareAboutData.lon}}).catch((err) => console.log(err));
+    // this.setState({
+    //   weatherData: weatherData.data
+    // })
+    return weatherData.data;
   }
   render() {
+    console.log(this.state);
     return (
       <>
         <h1>City Explorer</h1>
@@ -56,13 +66,13 @@ class App extends React.Component {
           </Button>
         </Form>
         {this.state.error ? <h3>{this.state.error}</h3> : ''}
-        {this.state.cityData.lat !== undefined ?
+        {this.state.lat !== undefined ?
           (
             <>
               <Jumbotron>
-                <h3>{this.state.cityData.display_name}</h3>
-                <h5>{this.state.cityData.lat}, {this.state.cityData.lon}</h5>
-                <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.cityData.lat},${this.state.cityData.lon}&zoom=13`} alt={`Map of ${this.state.cityData.display_name}`} />
+                <h3>{this.state.cityData}</h3>
+                <h5>{this.state.lat}, {this.state.lon}</h5>
+                <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONIQ_KEY}&center=${this.state.lat},${this.state.lon}&zoom=13`} alt={`Map of ${this.state.cityData}`} />
               </Jumbotron>
               <Weather weatherData={this.state.weatherData} />
             </>
