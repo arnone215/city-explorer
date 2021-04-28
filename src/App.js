@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Jumbotron } from 'react-bootstrap';
 import Weather from './Weather.js';
+import Movies from './Movies.js';
 import axios from 'axios';
 
 class App extends React.Component {
